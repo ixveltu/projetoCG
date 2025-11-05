@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste Sprite com Mapa</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #222;
+      width: 100vw;
+      height: 100vh;
+    }
+    canvas {
+      display: block;
+      background: #000;
+      width: 512px;
+      height: 512px;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+  <script>
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+    
+    function resize() {
+      canvas.width = 512;
+      canvas.height = 512;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Tamanho do mundo/mapa com escala (zoom)
+    const mapScale = 3; // Zoom 3x no mapa
+    const world = {
+      width: 512 * mapScale,
+      height: 512 * mapScale
+    };
+
+    // Câmera
+    const camera = {
+      x: 0,
+      y: 0
+    };
+
+    const player = {
+      x: world.width / 2 - 80, // Começa no centro do mapa escalado
+      y: world.height / 2, // Um pouco acima do centro
+      width: 32,
+      height: 32,
+      frameX: 0,
+      frameY: 0,
+      state: "idle",
+      speed: 5,
+      moving: false,
+      facing: 1
+    };
+
+    const keys = {};
+    window.addEventListener('keydown', e => keys[e.key] = true);
+    window.addEventListener('keyup', e => keys[e.key] = false);
+
+    // Imagens
+    const mapImage = new Image();
+    mapImage.src = "../assets/Mapa.png";
+
+    const sprites = {
+      idle: new Image(),
+      walk: new Image()
+    };
+    sprites.idle.src = "../assets/Idle.png";
+    sprites.walk.src = "../assets/Walk.png";
+
+    let loaded = 0;
+    const totalImages = 3; // mapa + idle + walk
+
+    mapImage.onload = () => {
+      loaded++;
+      fetchData();
+      console.log("Mapa carregado");
+      if (loaded === totalImages) {
+        requestAnimationFrame(loop);
+        
+      }
+    };
+
+    for (let key in sprites) {
+      sprites[key].onload = () => {
+        loaded++;
+        console.log(key + " carregado");
+        if (loaded === totalImages) {
+          requestAnimationFrame(loop);
+        }
+      };
+    }
+
+    function movePlayer() {
+      let move = false;
+      
+      if (keys["ArrowUp"] || keys["w"]) {
+        player.y -= player.speed;
+        player.frameY = 1;
+        move = true;
+      }
+      if (keys["ArrowDown"] || keys["s"]) {
+        player.y += player.speed;
+        player.frameY = 0;
+        move = true;
+      }
+      if (keys["ArrowLeft"] || keys["a"]) {
+        player.x -= player.speed;
+        player.frameY = 2;
+        move = true;
+        player.facing = -1;
+      }
+      if (keys["ArrowRight"] || keys["d"]) {
+        player.x += player.speed;
+        player.frameY = 2;
+        move = true;
+        player.facing = 1;
+      }
+
+      player.moving = move;
+      player.state = move ? "walk" : "idle";
+
+      // Limites do mundo
+      if (player.x < 0) player.x = 0;
+      if (player.y < 0) player.y = 0;
+      if (player.x + 64 > world.width) player.x = world.width - 64;
+      if (player.y + 64 > world.height) player.y = world.height - 64;
+    }
+
+    function updateCamera() {
+      // Centraliza a câmera no jogador
+      camera.x = player.x - canvas.width / 2 + 32;
+      camera.y = player.y - canvas.height / 2 + 32;
+
+      // Limita a câmera aos limites do mundo
+      if (camera.x < 0) camera.x = 0;
+      if (camera.y < 0) camera.y = 0;
+      if (camera.x + canvas.width > world.width) {
+        camera.x = world.width - canvas.width;
+      }
+      if (camera.y + canvas.height > world.height) {
+        camera.y = world.height - canvas.height;
+      }
+    }
+
+    let frameCount = 0;
+    function animateFrame() {
+      frameCount++;
+      if (frameCount % 10 === 0) {
+        player.frameX = (player.frameX + 1) % 3;
+      }
+    }
+
+    function drawWorld() {
+      if (!mapImage.complete) return;
+      // Desenha o mapa escalado (com zoom)
+      ctx.drawImage(
+        mapImage,
+        0, 0, // Origem na imagem original
+        512, 512, // Tamanho original do mapa
+        -camera.x, -camera.y, // Posição no canvas (movida pela câmera)
+        world.width, world.height // Tamanho escalado
+      );
+    }
+
+
+    async function fechData() {
+        let collisionsMap = [];
+        const response = await fetch('../assets/collisions.txt');
+        const data = await response.text();
+        const lines = data.trim().split('\n');
+    
+        lines.forEach(line => {
+            collisionsMap.unshift(line.trim().split(" ").map(num => parseInt(num)));
+        });
+        console.log(collisionsMap);
+        return collisionsMap;
+    }
+
+    async function checkColisions() {
+        const oldX = player.x;
+        const oldy = player.y;
+        let collisionsMap = await fechData();
+        
+        collisionsMap.forEach((line, indexY) => {
+                    if (num == 1) {
+                        const tileX = indexX * 64 * mapScale;
+                        const tileY = indexY * 64 * mapScale;
+                        if (player.x < tileX + 64 * mapScale &&
+                            player.x + 64 > tileX &&
+                            player.y < tileY + 64 * mapScale &&
+                            player.y + 64 > tileY) {
+                                player.x = oldX;
+                                player.y = oldy;
+                        }
+                    }
+                });
+    }
+
+    function drawPlayer() {
+      const img = sprites[player.state];
+      if (!img.complete) return;
+
+      // Posição do jogador na tela (relativa à câmera)
+      const screenX = player.x - camera.x;
+      const screenY = player.y - camera.y;
+
+      ctx.save();
+
+      if (player.facing === -1) {
+        ctx.translate(screenX + 64, screenY);
+        ctx.scale(-1, 1);
+        
+        ctx.drawImage(
+          img,
+          player.frameX * player.width,
+          player.frameY * player.height,
+          player.width,
+          player.height,
+          0,
+          0,
+          64,
+          64
+        );
+      } else {
+        ctx.drawImage(
+          img,
+          player.frameX * player.width,
+          player.frameY * player.height,
+          player.width,
+          player.height,
+          screenX,
+          screenY,
+          64,
+          64
+        );
+      }
+
+      ctx.restore();
+    }
+
+    function loop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      movePlayer();
+      checkColisions(),
+      updateCamera();
+      animateFrame();
+      drawWorld();
+      drawPlayer();
+      requestAnimationFrame(loop);
+    }
+
+  </script>
+</body>
+</html>
