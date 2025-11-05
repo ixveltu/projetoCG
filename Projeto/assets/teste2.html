@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste Idle Animation</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: linear-gradient(to bottom, #a8e063, #56ab2f);
+      height: 100%;
+      width: 100%;
+    }
+
+    canvas {
+      display: block;
+      margin: 0 auto;
+      background: rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+
+  <script>
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+
+    // Tamanho do canvas
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // === Configuração do jogador ===
+    const player = {
+      x: canvas.width / 2 - 48,
+      y: canvas.height / 2 - 48,
+      width: 32,   // largura de cada frame
+      height: 32,  // altura de cada frame
+      frameX: 0,
+      frameY: 0,
+      state: "idle",
+      speed: 4,
+      moving: false
+    };
+
+    const keys = {};
+    window.addEventListener('keydown', e => keys[e.key] = true);
+    window.addEventListener('keyup', e => keys[e.key] = false);
+
+    // === Carregar sprite Idle ===
+    const idleSprite = new Image();
+    idleSprite.src = "./Idle.png";
+    const walkSprite = new Image();
+    walkSprite.src = "./Walk.png";
+
+    let frameCount = 0;
+
+    // === Função para desenhar o jogador ===
+    function drawPlayer() {
+      ctx.drawImage(
+        idleSprite,
+        player.frameX * player.width, // origem X
+        player.frameY * player.height, // origem Y
+        player.width, player.height,   // tamanho do recorte
+        player.x, player.y,            // posição no canvas
+        player.width * 2, player.height * 2 // tamanho desenhado
+      );
+    }
+
+    function animateIdle() {
+      frameCount++;
+      if (frameCount % 5 === 0) { // muda de frame a cada 5 ciclos
+        player.frameX = (player.frameX + 1) % 4; 
+      }
+    }
+
+    // === Loop principal ===
+    function loop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      animateIdle();
+      drawPlayer();
+      requestAnimationFrame(loop);
+    }
+
+    // Iniciar o loop apenas quando a imagem estiver carregada
+    idleSprite.onload = () => {
+      console.log("Sprite Idle carregado ✅");
+      loop();
+    };
+  </script>
+</body>
+</html>

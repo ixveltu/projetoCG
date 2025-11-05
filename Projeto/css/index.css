@@ -1,11 +1,9 @@
 body {
-    margin: 0;
-    height: 100vh;
+    background-image: url("../assets/background.jpg"); /* https://www.freepik.com/free-vector/pixel-art-rural-landscape-background_49685499.htm#fromView=image_search_similar&page=1&position=0&uuid=cd1813c2-eb02-4ce6-b914-15b1b43b49be&query=farming+pixelart?log-in=google */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background: linear-gradient(180deg, #a8e063, #56ab2f);
     font-family: 'Poppins', sans-serif;
   }
 
@@ -22,6 +20,8 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 20px;
+    margin-bottom: 100px;
+    margin-top: 150px;
   }
 
   .menu button {
