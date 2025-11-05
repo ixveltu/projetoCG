@@ -1,19 +1,58 @@
 body {
   margin: 0;
   padding: 0;
-  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #65ea7d;
-  width: 100vw;
   height: 100vh;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  background-image: url("../assets/background.jpg");
 }
-canvas {
+
+.button {
+  font-family: "Comic Sans MS", sans-serif;
+  text-decoration: none;
+  color: #fff8e1;
+  font-size: 1.8rem;
+  font-weight: bold;
+  width: 250px;
+  padding: 15px 0;
+  background-size: 200px; 
+  background-repeat: repeat;
+  background-position: center;
+  border: 3px solid #3b1e0a;
+  border-radius: 12px;
+  box-shadow: 0 6px 0 #2a1407;
+  transition: all 0.15s ease-in-out;
+}
+
+.menuButton:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 9px 0 #2a1407;
+  filter: brightness(1.1);
+}
+
+.menuButton:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 0 #2a1407;
+  filter: brightness(0.9);
+}
+
+.canvasBorder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  padding: 100px 60px;
+  background-color: rgba(80, 45, 20, 0.9); 
+  border: 5px solid #2a1208;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+canvas{
   display: block;
-  background: #000;
-  width: 512px;
-  height: 512px;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
+  transform: translateY(-40px);
 }

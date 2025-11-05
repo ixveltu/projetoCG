@@ -2,8 +2,8 @@ const canvas = document.getElementById('c');
 const ctx = canvas.getContext('2d');
 
 function resize() {
-  canvas.width = 512;
-  canvas.height = 512;
+  canvas.width = 600;
+  canvas.height = 300;
 }
 window.addEventListener('resize', resize);
 resize();
@@ -17,8 +17,8 @@ const world = {
 const camera = { x: 0, y: 0 };
 
 const player = {
-  x: world.width / 2 - 80,
-  y: world.height / 2,
+  x: world.width / 2 - 95,
+  y: world.height / 2 - 20,
   width: 32,
   height: 32,
   frameX: 0,
