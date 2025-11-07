@@ -57,7 +57,7 @@ for (let key in sprites) {
   };
 }
 
-const collisions = [];  // Criar array vazio para fazer colisoes
+const collisions = [];  // Criar array vazio para adicionar as colisoes
 let tileSize = 16;  // Tamanho padrão de cada tile antes de carregar o arquivo
 
 async function loadCollisions() { 
@@ -73,10 +73,10 @@ async function loadCollisions() {
       for (let col = 0; col < values.length; col++) { // para cada valor na linha se for 1 cria a colisao caso contrario pode andar
         if (values[col] === "1") {
           collisions.push({
-            x: col * tileSize * mapScale,
-            y: row * tileSize * mapScale,
-            w: tileSize * mapScale,
-            h: tileSize * mapScale
+            x: col * tileSize * mapScale, // define a coordenada em x da colisao
+            y: row * tileSize * mapScale, // define a coordenada em y da colisao
+            w: tileSize * mapScale, // define a largura da tile onde ha colisao
+            h: tileSize * mapScale  // define a altura da tile onde ha colisao
           });
         }
       }
@@ -96,7 +96,7 @@ function rectsOverlap(a, b) {
 }
 
 function checkCollision(x, y) {
-  const hitbox = {
+  const hitbox = {  // criar hitbox do jogador
     x: x,
     y: y,
     w: player.width * 2,
@@ -104,6 +104,7 @@ function checkCollision(x, y) {
   };
   for (const c of collisions) { // verifica cada colisao para o array
     if (rectsOverlap(hitbox, c)) return true; // se houver colisao da return
+    console.log(hitbox, c);s
   }
   return false; // se nao houver colisao da return false
 }
@@ -142,7 +143,7 @@ function movePlayer() {
   player.moving = move;
   player.state = move ? "walk" : "idle";
 
-  // Limites do mundo
+  // Limites do mapa
   if (player.x < 0) player.x = 0; 
   if (player.y < 0) player.y = 0;
   if (player.x + 64 > world.width) player.x = world.width - 64;

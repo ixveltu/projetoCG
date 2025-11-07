@@ -22,7 +22,11 @@
   <script>
     const canvas = document.getElementById('c');
     const ctx = canvas.getContext('2d');
-    
+
+    const mapImage = new Image();
+    mapImage.src = "../assets/Mapa.png";
+  
+
     function resize() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;

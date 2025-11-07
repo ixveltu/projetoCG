@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crescimento das Árvores</title>
+  <style>
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: linear-gradient(to bottom, #9be15d, #00e3ae);
+}
+canvas {
+  display: block;
+}
+#popup {
+  position: absolute;
+  background: rgba(255,255,255,0.9);
+  color: #222;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-family: sans-serif;
+  font-weight: bold;
+  display: none;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas"></canvas>
+  <div id="popup">Pressiona E para regar</div>
+
+  <script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const popup = document.getElementById("popup");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// === Jogador ===
+const player = {
+  x: canvas.width / 2 - 32,
+  y: canvas.height / 2,
+  width: 32,
+  height: 32,
+  speed: 5
+};
+
+const playerSprite = new Image();
+playerSprite.src = "../assets/Walk.png";
+
+// === Sprite das árvores ===
+const treeSprite = new Image();
+treeSprite.src = "../assets/MapleTree.png"; // 5 frames horizontais (cada um 32x32)
+
+// === Criar 3 árvores ===
+const trees = [
+  { x: 300, y: canvas.height - 200, frame: 0, growing: false },
+  { x: 600, y: canvas.height - 220, frame: 0, growing: false },
+  { x: 900, y: canvas.height - 210, frame: 0, growing: false }
+];
+
+// === Teclas ===
+const keys = {};
+window.addEventListener("keydown", e => keys[e.key] = true);
+window.addEventListener("keyup", e => keys[e.key] = false);
+
+// === Movimento do jogador ===
+function movePlayer() {
+  if (keys["ArrowUp"] || keys["w"]) player.y -= player.speed;
+  if (keys["ArrowDown"] || keys["s"]) player.y += player.speed;
+  if (keys["ArrowLeft"] || keys["a"]) player.x -= player.speed;
+  if (keys["ArrowRight"] || keys["d"]) player.x += player.speed;
+
+  // Limites do ecrã
+  player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+  player.y = Math.max(0, Math.min(canvas.height - player.height, player.y));
+}
+
+// === Verificar interações com árvores ===
+function checkInteraction() {
+    let isNear = false;
+
+    trees.forEach(tree => {
+    const dx = (player.x + player.width / 2) - (tree.x + 16);
+    const dy = (player.y + player.height / 2) - (tree.y + 16);
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+if (distance < 60) {
+  isNear = true;
+  popup.style.display = "block";
+  popup.style.left = (tree.x - 10) + "px";
+  popup.style.top = (tree.y - 50) + "px";
+
+  if (keys["e"] && !tree.growing && tree.frame < 4) {
+tree.growing = true;
+growTree(tree);
+  }
+}
+  });
+
+  if (!isNear) popup.style.display = "none";
+}
+
+// === Crescimento da árvore ===
+function growTree(tree) {
+  const growthInterval = setInterval(() => {
+if (tree.frame < 4) {
+  tree.frame++;
+} else {
+  clearInterval(growthInterval);
+  tree.growing = false;
+}
+  }, 1000); // muda de frame a cada 1 segundo
+}
+
+// === Desenhar ===
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+// Árvores
+trees.forEach(tree => {
+ctx.drawImage(treeSprite,
+tree.frame * 32, 0, 32, 32,
+tree.x, tree.y, 64, 64 // dobra o tamanho para melhor visualização
+);
+});
+
+  // Jogador
+  ctx.drawImage(playerSprite, 0, 0, 32, 32, player.x, player.y, 32, 32);
+}
+
+function gameLoop() {
+  movePlayer();
+  checkInteraction();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+Promise.all([
+  new Promise(r => playerSprite.onload = r),
+  new Promise(r => treeSprite.onload = r)]).then(gameLoop);
+
+</script>
+</body>
+</html>

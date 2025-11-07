@@ -12,7 +12,7 @@ body {
 }
 
 .button {
-  font-family: "Comic Sans MS", sans-serif;
+  font-family: "Comic Sans MS", sans-serif;  /* trocar a fonte  */
   text-decoration: none;
   color: #fff8e1;
   font-size: 1.8rem;
