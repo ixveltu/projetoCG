@@ -222,7 +222,7 @@ function updateTrees() {
       if (tree.watered) speed *= 1.5;
       
       // Aumentar velocidade se adubada
-      if (tree.fertilized) speed *= 1.5;
+      if (tree.fertilized) speed *= 100;
 
       tree.growth += speed;
 
@@ -231,6 +231,28 @@ function updateTrees() {
         tree.stage++;
         tree.watered = false;
         tree.fertilized = false;
+      }
+    }
+  });
+}
+
+// NOVO: Atualizar progress bars
+function updateProgressBars() {
+  trees.forEach((tree, index) => {
+    const progressBar = document.getElementById(`progress-${index}`);
+    const stageText = document.getElementById(`stage-${index}`);
+    
+    if (progressBar && stageText) {
+      // Atualizar largura da barra
+      progressBar.style.width = `${tree.growth}%`;
+      
+      // Atualizar texto do estágio
+      stageText.textContent = `Estágio: ${tree.stage + 1}/4`;
+      
+      // Mudar cor se a árvore estiver completamente crescida
+      if (tree.stage === 3) {
+        progressBar.style.background = 'linear-gradient(90deg, #f39c12, #f1c40f, #f4d03f)';
+        progressBar.style.boxShadow = '0 0 10px rgba(241, 196, 15, 0.8)';
       }
     }
   });
@@ -417,6 +439,7 @@ function loop() {
   animateFrame();
   checkTreeProximity();
   updateTrees();
+  updateProgressBars(); // NOVO: Atualizar progress bars
   drawWorld();
   drawTrees();
   drawPlayer();
@@ -429,3 +452,8 @@ async function startGame() {
   await loadTrees();
   requestAnimationFrame(loop);
 }
+
+// NOVO: Event listener para o botão de menu
+document.getElementById('menuButton').addEventListener('click', () => {
+  alert('Menu! Aqui você pode adicionar funcionalidades futuras.');
+});
