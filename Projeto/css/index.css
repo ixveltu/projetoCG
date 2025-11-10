@@ -1,63 +1,159 @@
 body {
-  margin: 0;
-  padding: 0;
-  font-family: "Comic Sans MS", sans-serif;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background-image: url("../assets/background.jpg");
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-size: cover;
+    margin: 0;
+    padding: 0;
+    font-family: "Comic Sans MS", sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* Imagem de fundo removida daqui! */
+}
+
+.logo {
+    z-index: 5; /* Garante que o logo está acima das nuvens */
+    position: relative; /* Para que o z-index funcione */
 }
 
 .menu {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-  padding: 50px 60px;
-  background-color: rgba(80, 45, 20, 0.9); 
-  border: 5px solid #2a1208;
-  border-radius: 20px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 50px 60px;
+    background-color: rgba(80, 45, 20, 0.9); 
+    border: 5px solid #2a1208;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    z-index: 10; /* CRÍTICO: Garante que o menu está à frente de tudo */
+    position: relative; /* Para que o z-index funcione */
 }
 
 .menuButton {
-  color: #fff8e1;
-  font-size: 1.8rem;
-  font-weight: bold;
-  text-align: center;
-  text-decoration: none;
-  width: 250px;
-  padding: 15px 0;
-  background-position: center;
-  border: 3px solid #3b1e0a;
-  border-radius: 12px;
-  box-shadow: 0 6px 0 #2a1407;
-  transition: all 0.15s ease-in-out;
+    color: #fff8e1;
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    width: 250px;
+    padding: 15px 0;
+    background-position: center;
+    border: 3px solid #3b1e0a;
+    border-radius: 12px;
+    box-shadow: 0 6px 0 #2a1407;
+    transition: all 0.15s ease-in-out;
 }
 
 .menuButton:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 9px 0 #2a1407;
-  filter: brightness(1.1);
+    transform: translateY(-3px);
+    box-shadow: 0 9px 0 #2a1407;
+    filter: brightness(1.1);
 }
 
 .menuButton:active {
-  transform: translateY(0);
-  box-shadow: 0 6px 0 #2a1407;
-  filter: brightness(0.9);
+    transform: translateY(0);
+    box-shadow: 0 6px 0 #2a1407;
+    filter: brightness(0.9);
 }
 
 .footer {
-  position: absolute;
-  bottom: 20px;
-  text-align: center;
-  color: #f0d6a3;
-  font-size: 1.1rem;
-  opacity: 0.9;
+    position: absolute;
+    bottom: 20px;
+    text-align: center;
+    color: #f0d6a3;
+    font-size: 1.1rem;
+    opacity: 0.9;
+    z-index: 5; /* Garante que o footer está acima das nuvens */
 }
 
+.sky-background {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden; 
+    z-index: -2; 
+
+    background-image: url("../assets/background.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+/* --- 3. ÁREAS DAS NUVENS EM X --- */
+
+.cloud-area-left,
+.cloud-area-right {
+    position: absolute; /* Posicionamento dentro do body */
+    width: 500px; /* Largura da área onde as nuvens se movem */
+    height: 350px; /* Altura da área onde as nuvens se movem */
+    overflow: hidden; /* Corta as nuvens que saem desta área */
+    z-index: -1; /* Fica abaixo do menu, mas acima do fundo */
+}
+
+.cloud-area-left {
+    top: 10vh; /* Ajuste a posição vertical */
+    left: 3vw; /* Ajuste a posição horizontal */
+}
+
+.cloud-area-right {
+    top: 10vh; /* Ajuste a posição vertical */
+    right: 3vw; /* Ajuste a posição horizontal */
+}
+
+
+/* --- 4. ESTILO DA NUVEM --- */
+.cloud {
+    position: absolute; 
+    width: 400px;  /* Tamanho da nuvem */
+    height: 150px; /* Tamanho da nuvem */
+    
+    background-image: url('../assets/cloud-sprite1.png'); 
+    background-size: contain; 
+    background-repeat: no-repeat;
+    background-position: center; 
+    
+    background-color: transparent; 
+}
+
+/* --- 5. KEYFRAMES ESPECÍFICOS PARA O MOVIMENTO EM X NAS ÁREAS --- */
+
+/* Movimento 1 (diagonal cima-esquerda para baixo-direita) dentro de cada área */
+@keyframes move-diag-1 {
+  0% { transform: translate(-100%, -100%); } /* Começa fora do canto superior esquerdo da área */
+  50% { transform: translate(50%, 50%); } /* Passa pelo centro da área */
+  100% { transform: translate(100%, 100%); } /* Termina fora do canto inferior direito da área */
+}
+
+/* Movimento 2 (diagonal cima-direita para baixo-esquerda) dentro de cada área */
+@keyframes move-diag-2 {
+  0% { transform: translate(100%, -100%); } /* Começa fora do canto superior direito da área */
+  50% { transform: translate(0%, 0%); } /* Passa pelo centro da área */
+  100% { transform: translate(-100%, 100%); } /* Termina fora do canto inferior esquerdo da área */
+}
+
+/* --- 6. APLICAÇÃO DA ANIMAÇÃO ÀS NUVENS ESPECÍFICAS (COM VAI-E-VEM) --- */
+
+.cloud-left-1 {
+    animation: move-diag-1 20s linear infinite alternate; /* Adicionado 'alternate' */
+    top: 0; left: 0;
+}
+
+.cloud-left-2 {
+    animation: move-diag-2 20s linear infinite alternate; /* Adicionado 'alternate' */
+    animation-delay: 10s; 
+    top: 0; right: 0;
+}
+
+.cloud-right-1 {
+    animation: move-diag-1 20s linear infinite alternate; /* Adicionado 'alternate' */
+    animation-delay: 5s;
+    top: 0; left: 0;
+}
+
+.cloud-right-2 {
+    animation: move-diag-2 20s linear infinite alternate; /* Adicionado 'alternate' */
+    animation-delay: 15s;
+    top: 0; right: 0;
+}
