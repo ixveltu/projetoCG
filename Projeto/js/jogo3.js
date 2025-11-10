@@ -219,10 +219,10 @@ function updateTrees() {
       let speed = tree.growthSpeed;
       
       // Aumentar velocidade se regada
-      if (tree.watered) speed *= 1.5;
+      if (tree.watered) speed *= 100;
       
       // Aumentar velocidade se adubada
-      if (tree.fertilized) speed *= 100;
+      if (tree.fertilized) speed *= 2;
 
       tree.growth += speed;
 
@@ -236,7 +236,7 @@ function updateTrees() {
   });
 }
 
-// NOVO: Atualizar progress bars
+// Atualizar progress bars
 function updateProgressBars() {
   trees.forEach((tree, index) => {
     const progressBar = document.getElementById(`progress-${index}`);
@@ -251,7 +251,7 @@ function updateProgressBars() {
       
       // Mudar cor se a árvore estiver completamente crescida
       if (tree.stage === 3) {
-        progressBar.style.background = 'linear-gradient(90deg, #f39c12, #f1c40f, #f4d03f)';
+        progressBar.style.background = '(#2ecc71)';
         progressBar.style.boxShadow = '0 0 10px rgba(241, 196, 15, 0.8)';
       }
     }
