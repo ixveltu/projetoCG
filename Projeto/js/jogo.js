@@ -251,7 +251,7 @@ function updateProgressBars() {
       
       // Mudar cor se a árvore estiver completamente crescida
       if (tree.stage === 3) {
-        progressBar.style.background = 'linear-gradient(90deg, #f39c12, #f1c40f, #f4d03f)';
+        progressBar.style.background = '#ffffff';
         progressBar.style.boxShadow = '0 0 10px rgba(241, 196, 15, 0.8)';
       }
     }
@@ -439,7 +439,7 @@ function loop() {
   animateFrame();
   checkTreeProximity();
   updateTrees();
-  updateProgressBars(); // NOVO: Atualizar progress bars
+  updateProgressBars(); 
   drawWorld();
   drawTrees();
   drawPlayer();
