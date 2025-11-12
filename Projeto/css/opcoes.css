@@ -1,0 +1,41 @@
+body {
+margin: 0;
+padding: 0;
+display: flex;
+justify-content: center;
+align-items: center;
+height: 100vh;
+background-repeat: no-repeat;
+background-size: cover;
+background-position: center center;
+background-image: url("../assets/background.jpg");
+}
+
+.button {
+color: #fff8e1;
+font-size: 1.3rem;
+font-weight: bold;
+text-align: center;
+text-decoration: none;
+padding: 10px 10px;
+border: 3px solid #3b1e0a;
+background-color: rgba(80, 45, 20, 0.9); 
+border-radius: 12px;
+box-shadow: 0 6px 0 #2a1407;
+transition: all 0.15s ease-in-out;
+position: fixed;
+top: 1%;
+left: 1%;
+}
+  
+.button:hover {
+transform: translateY(-3px);
+box-shadow: 0 9px 0 #2a1407;
+filter: brightness(1.1);
+}
+  
+.button:active {
+transform: translateY(0);
+box-shadow: 0 6px 0 #2a1407;
+filter: brightness(0.9);
+}
