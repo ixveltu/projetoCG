@@ -223,31 +223,35 @@ function checkTreeProximity() {
 
 // atualizar crescimento das árvores
 function updateTrees() {
-  trees.forEach(tree => {
+  trees.forEach((tree, index) => {
     if (tree.stage < 3) {
       let speed = tree.growthSpeed;
       
       // Aumentar velocidade se regada
-      if (tree.watered) speed *= 1.5;
+      if (tree.watered) speed *= 2;
       
       // Aumentar velocidade se adubada
       if (tree.fertilized) speed *= 100;  // TROCAR ANTES DE ENVIAR 
 
       tree.growth += speed;
-
       // Verificar se a árvore cresceu para o próximo estágio
-      if (tree.growth >= 100) {
+      if (tree.growth >= 100 && tree.stage != 3) {
         tree.growth = 0;
         tree.stage++;
         tree.watered = false;
         tree.fertilized = false;
+
+      if (tree.stage === 3) {
+        tree.growth = 100; // garantir que a árvore está totalmente crescida
       }
     }
+  }
   });
 }
 
 // atualizar barras de progresso no HTML
 function updateProgressBars() {
+
   trees.forEach((tree, index) => {  // para cada arvore associar ao index uma progressbar
     const progressBar = document.getElementById(`progress-${index}`); // selecionar progressbar pelo index
     const stageText = document.getElementById(`stage-${index}`);  // selecionar texto do estágio pelo index
@@ -258,16 +262,15 @@ function updateProgressBars() {
       
       // Atualizar texto do estágio
       stageText.textContent = `Estágio: ${tree.stage + 1}/4`;
-      
+
       // Mudar cor de progressbar se a árvore estiver crescida
-      if (tree.stage === 3 && tree.growth >= 100) {
-        progressBar.style.background = '#00ff00'; // nao esta a funcionar 
+      if (tree.stage === 3) {
+        progressBar.style.background = '#00ff00';
         progressBar.style.boxShadow = '0 0 10px rgba(241, 196, 15, 0.8)';
       }
     }
   });
 }
-
 
 // Interação com árvore
 function interactTree(action) {
@@ -278,7 +281,6 @@ function interactTree(action) {
   } else if (action === 'fertilize') {
     nearbyTree.fertilized = true;
   }
-
   showInteraction = false;
 }
 
@@ -449,20 +451,9 @@ function drawInteractionMenu() {
   ctx.textAlign = 'center';
   ctx.fillText('Q Regar', menuX + 60, menuY + 30);
   ctx.fillText('E Adubar', menuX + 180, menuY + 30);
-}
+} 
 
-// mensagem de parabens quando todas as arvores crescerem
-const congratsMessage = document.getElementById('congratsMessage');
-if (allTreesGrown && trees.length > 0) {
-  if (congratsMessage) {
-    congratsMessage.style.display = 'flex';
-  }
-} else {
-  if (congratsMessage) {
-    congratsMessage.style.display = 'none';
-  }
-}
-
+// loop principal do jogo
 function loop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   movePlayer();

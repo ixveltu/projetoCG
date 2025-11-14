@@ -110,7 +110,7 @@ canvas{
 /* Preenchimento da barra */
 .progress-fill {
   height: 100%;
-  width: 0%;
+  width: 100%;
   background: linear-gradient(90deg, #27ae60, #2ecc71, #58d68d);
   border-radius: 10px;
   transition: width 0.3s ease;
