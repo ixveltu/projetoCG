@@ -1,4 +1,4 @@
-const canvas = document.getElementById('c');
+const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
 function resize() {
@@ -184,12 +184,13 @@ function movePlayer() {
   if (!checkCollision(newX, player.y)) player.x = newX;
   if (!checkCollision(player.x, newY)) player.y = newY;
 
-  player.moving = move;
-  player.state = move ? "walk" : "idle";
+  player.moving = move; // atualizar estado de movimento
+  player.state = move ? "walk" : "idle";  // atualizar estado do jogador
 
-  if (player.x < 0) player.x = 0;
-  if (player.y < 0) player.y = 0;
-  if (player.x + 64 > world.width) player.x = world.width - 64;
+  // limitar movimento ao mundo
+  if (player.x < 0) player.x = 0; 
+  if (player.y < 0) player.y = 0; 
+  if (player.x + 64 > world.width) player.x = world.width - 64; 
   if (player.y + 64 > world.height) player.y = world.height - 64;
 }
 
@@ -236,7 +237,7 @@ function updateTrees() {
   });
 }
 
-// NOVO: Atualizar progress bars
+
 function updateProgressBars() {
   trees.forEach((tree, index) => {
     const progressBar = document.getElementById(`progress-${index}`);
@@ -249,14 +250,15 @@ function updateProgressBars() {
       // Atualizar texto do estágio
       stageText.textContent = `Estágio: ${tree.stage + 1}/4`;
       
-      // Mudar cor se a árvore estiver completamente crescida
-      if (tree.stage === 3) {
-        progressBar.style.background = '#ffffff';
+      // Mudar cor de progressbar se a árvore estiver crescida
+      if (tree.stage === 3 && tree.growth >= 100) {
+        progressBar.style.background = '#00ff00'; // nao esta a funcionar 
         progressBar.style.boxShadow = '0 0 10px rgba(241, 196, 15, 0.8)';
       }
     }
   });
 }
+
 
 // Interação com árvore
 function interactTree(action) {
@@ -432,6 +434,18 @@ function drawInteractionMenu() {
   ctx.fillText('E Adubar', menuX + 180, menuY + 30);
 }
 
+const congratsMessage = document.getElementById('congratsMessage');
+if (allTreesGrown && trees.length > 0) {
+  if (congratsMessage) {
+    congratsMessage.style.display = 'flex';
+  }
+} else {
+  if (congratsMessage) {
+    congratsMessage.style.display = 'none';
+  }
+}
+
+
 function loop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   movePlayer();
@@ -452,8 +466,3 @@ async function startGame() {
   await loadTrees();
   requestAnimationFrame(loop);
 }
-
-// NOVO: Event listener para o botão de menu
-document.getElementById('menuButton').addEventListener('click', () => {
-  alert('Menu! Aqui você pode adicionar funcionalidades futuras.');
-});

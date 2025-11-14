@@ -439,7 +439,7 @@ function loop() {
   animateFrame();
   checkTreeProximity();
   updateTrees();
-  updateProgressBars(); // NOVO: Atualizar progress bars
+  updateProgressBars();
   drawWorld();
   drawTrees();
   drawPlayer();
