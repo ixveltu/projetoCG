@@ -297,16 +297,18 @@
         }
         
         if (gesture === 'open' && lastGesture !== 'open' && gestureDebounce === 0) {
-          statusDiv.textContent = '✋ MÃO ABERTA - ADUBAR!';
-          statusDiv.className = 'gesture-status gesture-open';
-          simulateKeyPress('e');
+          console.log('Mão Aberta Detectada - Adubar (E)'); // debug
+          statusDiv.textContent = '✋ MÃO ABERTA - ADUBAR!';  
+          statusDiv.className = 'gesture-status gesture-open';  // alterar classe para estilo aberto
+          simulateKeyPress('e');  // trigger tecla e
           lastGesture = 'open';
           gestureDebounce = DEBOUNCE_TIME;
         } else if (gesture === 'closed' && lastGesture !== 'closed' && gestureDebounce === 0) {
+          console.log('Mão Fechada Detectada - Regar (Q)'); // debug
           statusDiv.textContent = '✊ MÃO FECHADA - REGAR!';
           statusDiv.className = 'gesture-status gesture-closed';
-          simulateKeyPress('q');
-          lastGesture = 'closed';
+          simulateKeyPress('q');  // trigger tecla q
+          lastGesture = 'closed'; // atualizar último gesto
           gestureDebounce = DEBOUNCE_TIME;
         } else if (gesture === 'none') {
           statusDiv.textContent = 'Aguardando gesto...';

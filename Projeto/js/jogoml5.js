@@ -1,36 +1,214 @@
 const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d');
 
-// Redimensionar canvas
-function resize() {
-  canvas.width = 600;
-  canvas.height = 300;
+    function resize() {
+      canvas.width = 600;
+      canvas.height = 300;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    const mapScale = 3;
+    const world = {
+      width: 512 * mapScale,
+      height: 512 * mapScale
+    };
+
+    const camera = { x: 0, y: 0 };
+
+    const player = {
+      x: world.width / 2 - 95,
+      y: world.height / 2 - 20,
+      width: 32,
+      height: 32,
+      frameX: 0,
+      frameY: 0,
+      state: "idle",
+      speed: 5,
+      moving: false,
+      facing: 1
+    };
+
+
+let video;
+let handpose;
+let predictions = [];
+let videoCanvas;
+let videoCtx;
+
+let lastGesture = null;
+let gestureDebounce = 0;
+const DEBOUNCE_TIME = 30; // 30 ms para debounce (para detetar novo gesto)
+
+// tracking de mão com ml5.js
+function setupHandTracking() {
+  video = document.createElement('video');
+  video.width = 320;  
+  video.height = 240;
+  video.style.display = 'none';
+  document.body.appendChild(video);
+  
+  videoCanvas = document.getElementById('videoCanvas');
+  videoCtx = videoCanvas.getContext('2d');
+  
+  navigator.mediaDevices.getUserMedia({ 
+    video: { width: 320, height: 240 }}).then(stream => { // acessar webcam
+    video.srcObject = stream; // definir stream de video
+    video.play();
+    
+    handpose = ml5.handpose(video, modelReady);
+    handpose.on('predict', results => {
+      predictions = results;
+    });
+  }).catch(err => {
+    console.error('Erro ao acessar webcam:', err);
+    document.getElementById('statusText').textContent = 'Erro: Permita acesso à webcam';
+  });
 }
-window.addEventListener('resize', resize);
-resize();
 
-// Definir tamanho e escala do mundo 
-const mapScale = 3;
-const world = {
-  width: 512 * mapScale,
-  height: 512 * mapScale
-};
+// função chamada quando o modelo está pronto
+function modelReady() {
+  console.log('Modelo carregado!');
+  document.getElementById('statusText').textContent = 'Sistema pronto! Mostre sua mão';
+  document.getElementById('statusIndicator').className = 'status-indicator status-ready';
+}
 
-const camera = { x: 0, y: 0 };
+// calcular distância entre dois pontos
+function distance(p1, p2) {
+  return Math.sqrt(Math.pow(p1[0] - p2[0], 2) + Math.pow(p1[1] - p2[1], 2));
+}
 
-// Definir tamanho do jogador
-const player = {
-  x: world.width / 2 - 95,
-  y: world.height / 2 - 20,
-  width: 32,
-  height: 32,
-  frameX: 0,
-  frameY: 0,
-  state: "idle",
-  speed: 5,
-  moving: false,
-  facing: 1
-};
+// detectar gesto baseado na distância dos dedos ao pulso
+function detectGesture(hand) {
+  const landmarks = hand.landmarks;
+  
+  const wrist = landmarks[0]; // ponto do pulso
+  const thumbTip = landmarks[4];  // ponta do polegar
+  const indexTip = landmarks[8];  // ponta do indicador 
+  const middleTip = landmarks[12];  // ponta do médio
+  const ringTip = landmarks[16];  // ponta do anelar
+  const pinkyTip = landmarks[20]; // ponta do mindinho
+  
+  const indexDist = distance(indexTip, wrist);  // distância do indicador ao pulso
+  const middleDist = distance(middleTip, wrist);  // distância do médio ao pulso
+  const ringDist = distance(ringTip, wrist);  // distância do anelar ao pulso
+  const pinkyDist = distance(pinkyTip, wrist);  // distância do mindinho ao pulso
+  
+  const avgDistance = (indexDist + middleDist + ringDist + pinkyDist) / 4;
+  
+  // definir distancia media para mão aberta e fechada
+  if (avgDistance > 150) {
+    return 'open';
+  } else if (avgDistance < 100) {
+    return 'closed';
+  }
+  
+  return 'none';
+}
+
+// funcao para simular tecla pressionada com gesto de mão
+function simulateKeyPress(key) {
+  const eventDown = new KeyboardEvent('keydown', {
+    key: key,
+    code: key === 'q' ? 'KeyQ' : 'KeyE',
+    bubbles: true
+  });
+  
+  // evento de soltar a tecla
+  const eventUp = new KeyboardEvent('keyup', {
+    key: key,
+    code: key === 'q' ? 'KeyQ' : 'KeyE',  // se for q envia code KeyQ senao KeyE
+    bubbles: true
+  });
+  
+  // disparar eventos
+  window.dispatchEvent(eventDown);
+  setTimeout(() => {
+    window.dispatchEvent(eventUp);
+  }, 100);
+}
+
+// desenhar mão e detetar gestos
+function drawHand() {
+  videoCtx.clearRect(0, 0, videoCanvas.width, videoCanvas.height);
+  
+  videoCtx.save();  // save canvas state
+  videoCtx.scale(-1, 1);  // espelhar video 
+  videoCtx.drawImage(video, -videoCanvas.width, 0, videoCanvas.width, videoCanvas.height);
+  videoCtx.restore();
+  
+  // desenhar mão e detectar gestos
+  if (predictions.length > 0) {
+    const hand = predictions[0];
+    const gesture = detectGesture(hand);
+    
+    // desenhar pontos da mão
+    const landmarks = hand.landmarks;
+    videoCtx.fillStyle = '#00ff00';
+    landmarks.forEach(point => {
+      videoCtx.beginPath();
+      videoCtx.arc(videoCanvas.width - point[0], point[1], 5, 0, 2 * Math.PI);
+      videoCtx.fill();
+    });
+  
+    // desenhar conexões entre os pontos
+    videoCtx.strokeStyle = '#00ff00'; 
+    videoCtx.lineWidth = 2; // definir largura da linha
+    const connections = [ // definir conexoes entre os pontos da mão
+      [0, 1], [1, 2], [2, 3], [3, 4],
+      [0, 5], [5, 6], [6, 7], [7, 8],
+      [0, 9], [9, 10], [10, 11], [11, 12],
+      [0, 13], [13, 14], [14, 15], [15, 16],
+      [0, 17], [17, 18], [18, 19], [19, 20],
+      [5, 9], [9, 13], [13, 17] // conexoes entre os dedos (default do ml5.js)
+    ];
+    
+    // desenhar linhas entre os pontos conectados
+    connections.forEach(([start, end]) => { // para cada conexao
+      videoCtx.beginPath(); // iniciar novo caminho
+      videoCtx.moveTo(videoCanvas.width - landmarks[start][0], landmarks[start][1]);  // linha do ponto inicial
+      videoCtx.lineTo(videoCanvas.width - landmarks[end][0], landmarks[end][1]);  // linha até o ponto final
+      videoCtx.stroke();
+    });
+    
+    // atualizar estado do gesto
+    const statusDiv = document.getElementById('gestureStatus');
+    
+    if (gestureDebounce > 0) {
+      gestureDebounce--;
+    }
+    // verificar mudanças de gesto com debounce
+    if (gesture === 'open' && lastGesture !== 'open' && gestureDebounce === 0) {  // nova detecção de mão aberta
+      console.log('Mão Aberta Detectada - Adubar (E)'); // debug
+      statusDiv.textContent = '✋ MÃO ABERTA - ADUBAR!';    // alterar texto
+      statusDiv.className = 'gesture-status gesture-open';  // alterar classe para estilo aberto
+      simulateKeyPress('e');  // trigger tecla e
+      lastGesture = 'open'; // atualizar último gesto
+      gestureDebounce = DEBOUNCE_TIME;
+    } else if (gesture === 'closed' && lastGesture !== 'closed' && gestureDebounce === 0) {
+      console.log('Mão Fechada Detectada - Regar (Q)'); // debug
+      statusDiv.textContent = '✊ MÃO FECHADA - REGAR!';  // alterar texto
+      statusDiv.className = 'gesture-status gesture-closed';
+      simulateKeyPress('q');  // trigger tecla q
+      lastGesture = 'closed'; // atualizar último gesto
+      gestureDebounce = DEBOUNCE_TIME;  // iniciar debounce (detetar gesto e dar tempo até poder detetar um novo gesto)
+    } else if (gesture === 'none') {
+      statusDiv.textContent = 'Aguardando gesto...';
+      statusDiv.className = 'gesture-status';
+      if (gestureDebounce === 0) {
+        lastGesture = null;
+      }
+    }
+  } else {
+    document.getElementById('gestureStatus').textContent = 'Mostre sua mão';
+  }
+  
+  requestAnimationFrame(drawHand);  // loop de desenho
+}
+
+document.getElementById('statusIndicator').className = 'status-indicator status-loading';
+setupHandTracking();
+setTimeout(() => drawHand(), 1000); // iniciar desenho da mão após delay de 1 segundo
 
 const keys = {};
 window.addEventListener('keydown', e => keys[e.key] = true);

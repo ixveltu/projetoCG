@@ -1,0 +1,75 @@
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/ml5@0.12.2/dist/ml5.min.js"></script>
+  <title>EcoFarm - Jogo</title>
+  <link rel="stylesheet" href="../css/jogoml5.css">
+</head>
+<body>
+
+  <div class="canvasBorder"> 
+
+    <div class="info-panel">
+      <p><span class="status-indicator" id="statusIndicator"></span><span id="statusText">A carregar modelo...</span></p>
+    </div>
+
+      <div class="video-container">
+        <canvas id="videoCanvas" width="320" height="240"></canvas>
+        <div class="gesture-status" id="gestureStatus">Aguardando...</div>
+    </div>
+    
+    <canvas id="gameCanvas"></canvas> 
+    <div id="progressContainer" class="progress-container">
+      <div class="tree-progress">
+        <h3>Macieira</h3>
+       <div class="progress-bar">
+          <div class="progress-fill" id="progress-0"></div>
+        </div>
+        <span class="stage-text" id="stage-0">1/4</span>
+      </div>
+      <div class="tree-progress">
+       <h3>Laranjeira</h3>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-1"></div>
+        </div>
+        <span class="stage-text" id="stage-1">1/4</span>
+      </div>
+      <div class="tree-progress">
+        <h3>Pessegueiro</h3>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-2"></div>
+        </div>
+        <span class="stage-text" id="stage-2">1/4</span>
+      </div>
+      <div class="tree-progress">
+        <h3>Cerejeira</h3>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-3"></div>
+        </div>
+        <span class="stage-text" id="stage-3">1/4</span>
+      </div>
+      <div class="tree-progress">
+        <h3>Ameixeira</h3>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-4"></div>
+        </div>
+        <span class="stage-text" id="stage-4">1/4</span>
+      </div>
+      <div class="tree-progress">
+        <h3>Pereira</h3>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-5"></div>
+        </div>
+        <span class="stage-text" id="stage-5">1/4</span>
+      </div>
+    </div>
+  </div>  
+  <a href="../index.html" class="button">← Sair</a>
+  <script src="../js/jogoml5.js"></script>
+</body>
+</html>
+
+
