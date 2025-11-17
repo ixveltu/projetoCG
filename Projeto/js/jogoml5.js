@@ -36,8 +36,8 @@ let predictions = [];
 let videoCanvas;
 let videoCtx;
 
-let lastGesture = null;
-let gestureDebounce = 0;
+let lastGesture = null; // último gesto detectado
+let gestureDebounce = 0;  // contador para debounce de gestos
 const DEBOUNCE_TIME = 30; // 30 ms para debounce (para detetar novo gesto)
 
 // tracking de mão com ml5.js
@@ -56,7 +56,7 @@ function setupHandTracking() {
     video.srcObject = stream; // definir stream de video
     video.play();
     
-    handpose = ml5.handpose(video, modelReady);
+    handpose = ml5.handpose(video, modelReady); 
     handpose.on('predict', results => {
       predictions = results;
     });
@@ -68,14 +68,14 @@ function setupHandTracking() {
 
 // função chamada quando o modelo está pronto
 function modelReady() {
-  console.log('Modelo carregado!');
+  console.log('Modelo carregado!'); // debug
   document.getElementById('statusText').textContent = 'Sistema pronto! Mostre sua mão';
   document.getElementById('statusIndicator').className = 'status-indicator status-ready';
 }
 
 // calcular distância entre dois pontos
 function distance(p1, p2) {
-  return Math.sqrt(Math.pow(p1[0] - p2[0], 2) + Math.pow(p1[1] - p2[1], 2));
+  return Math.sqrt(Math.pow(p1[0] - p2[0], 2) + Math.pow(p1[1] - p2[1], 2));  // raiz da soma da diferença dos quadrados
 }
 
 // detectar gesto baseado na distância dos dedos ao pulso
@@ -174,6 +174,7 @@ function drawHand() {
     // atualizar estado do gesto
     const statusDiv = document.getElementById('gestureStatus');
     
+    // diminuir debounce para cada frame
     if (gestureDebounce > 0) {
       gestureDebounce--;
     }
